@@ -88,6 +88,7 @@ async def async_setup_platform(
     async_add_entities(
         [
             ClimateGroup(
+                config.get(CONF_UNIQUE_ID),
                 config.get(CONF_NAME),
                 config[CONF_ENTITIES],
                 config.get(CONF_EXCLUDE),
