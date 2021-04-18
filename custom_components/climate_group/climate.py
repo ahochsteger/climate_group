@@ -26,6 +26,7 @@ from homeassistant.const import (
     CONF_TEMPERATURE_UNIT,
     CONF_ENTITIES,
     CONF_NAME,
+    CONF_UNIQUE_ID,
     ATTR_SUPPORTED_FEATURES,
 )
 from homeassistant.core import State, callback
@@ -40,6 +41,7 @@ CONF_EXCLUDE = "exclude"
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
+        vol.Optional(CONF_UNIQUE_ID): cv.string,
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
         vol.Optional(CONF_TEMPERATURE_UNIT, default=TEMP_CELSIUS): cv.string,
         vol.Required(CONF_ENTITIES): cv.entities_domain(climate.DOMAIN),
@@ -99,9 +101,10 @@ class ClimateGroup(ClimateEntity):
     """Representation of a climate group."""
 
     def __init__(
-        self, name: str, entity_ids: List[str], excluded: List[str], unit: str
+        self, unique_id: str, name: str, entity_ids: List[str], excluded: List[str], unit: str
     ) -> None:
         """Initialize a climate group."""
+        self._unique_id = unique_id  # type: str
         self._name = name  # type: str
         self._entity_ids = entity_ids  # type: List[str]
         if "c" in unit.lower():
@@ -145,6 +148,11 @@ class ClimateGroup(ClimateEntity):
         if self._async_unsub_state_changed is not None:
             self._async_unsub_state_changed()
             self._async_unsub_state_changed = None
+
+    @property
+    def unique_id(self) -> str:
+        """Return a unique ID."""
+        return self._unique_id
 
     @property
     def name(self) -> str:
